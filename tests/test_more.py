@@ -118,6 +118,20 @@ class ChunkedTests(TestCase):
             ValueError, "n must not be None when using strict mode.", f
         )
 
+    def test_strict_being_true_defers_error(self):
+        """Test that ``chunked()`` with ``strict=True`` does not raise while
+        the iterator is created and complete chunks are still available; the
+        error is raised when the final, incomplete chunk is reached.
+
+        """
+        chunks = mi.chunked(range(5), 2, strict=True)
+        self.assertEqual(next(chunks), [0, 1])
+        self.assertEqual(next(chunks), [2, 3])
+        with self.assertRaisesRegex(
+            ValueError, 'iterable is not divisible by n'
+        ):
+            next(chunks)
+
 
 class FirstTests(TestCase):
     def test_many(self):
